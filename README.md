@@ -1,2 +1,2 @@
-# Data Quality and Privacy checker
+# Privacy Checker
 Author-LAKSHAY

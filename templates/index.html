@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Checker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Privacy Checker home"><span class="brand-mark">PC</span><span>Privacy Checker</span></a>
+      <span class="status"><i></i> Local analysis</span>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">Data quality / privacy audit</p>
+      <h1>See what your<br><em>data reveals.</em></h1>
+      <p class="lede">Drop in a spreadsheet and get a quick read on missing values, duplicates, and exposed personal information.</p>
+    </section>
+
+    <section class="workspace">
+      <form class="upload-panel" method="post" enctype="multipart/form-data">
+        <div class="panel-heading"><span class="step">01</span><h2>Choose a file</h2></div>
+        <label class="dropzone" for="file-input">
+          <span class="upload-icon">+</span>
+          <strong>Drop a file here</strong>
+          <span>or click to browse</span>
+          <small>CSV, XLSX, or XLS · 10 MB max</small>
+          <input id="file-input" name="file" type="file" accept=".csv,.xlsx,.xls">
+        </label>
+        <p class="selected-file" id="selected-file">No file selected</p>
+        <button class="primary-button" type="submit">Run privacy scan <span>→</span></button>
+        <div class="sample-row"><span>Want to try it first?</span><button formaction="/demo" formmethod="post" class="text-button" type="submit">Use sample data</button></div>
+      </form>
+
+      <div class="results-panel">
+        {% if error %}
+        <div class="notice error"><strong>Scan paused</strong><span>{{ error }}</span></div>
+        {% elif result %}
+        <div class="result-heading"><div><p class="eyebrow">Scan complete</p><h2>{{ result.filename }}</h2></div><span class="result-dot">●</span></div>
+        <div class="metrics">
+          <div class="metric"><span>Rows scanned</span><strong>{{ result.row_count }}</strong></div>
+          <div class="metric"><span>Columns</span><strong>{{ result.column_count }}</strong></div>
+          <div class="metric"><span>Duplicates</span><strong>{{ result.duplicate_count }}</strong></div>
+          <div class="metric"><span>PII columns</span><strong>{{ result.pii_count }}</strong></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Column</th><th>Missing</th><th>Signal</th><th>Risk</th></tr></thead>
+            <tbody>
+              {% for row in result.rows %}
+              <tr><td class="column-name">{{ row.name }}</td><td>{{ "%.2f"|format(row.missing) }}%</td><td>{{ row.pii }}</td><td><span class="risk risk-{{ row.risk|lower }}">{{ row.risk }}</span></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><span class="empty-number">02</span><div class="empty-line"></div><h2>Your results<br>will land here.</h2><p>Everything is processed locally on your machine. Your uploaded data is never sent anywhere.</p></div>
+        {% endif %}
+      </div>
+    </section>
+    <footer><span>Privacy Checker</span><span>Built for a clearer data handoff</span></footer>
+  </main>
+  <script>
+    const input = document.querySelector('#file-input');
+    const selected = document.querySelector('#selected-file');
+    input.addEventListener('change', () => { selected.textContent = input.files[0]?.name || 'No file selected'; });
+  </script>
+</body>
+</html>

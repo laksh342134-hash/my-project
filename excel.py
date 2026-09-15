@@ -1,5 +1,6 @@
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
+import sys
 
 from report import generate_report
 
@@ -24,6 +25,7 @@ def export_excel_report(report_df, output_path="risk_report.xlsx"):
 
 
 if __name__ == "__main__":
-    report = generate_report("sample_data.csv")
+    input_path = sys.argv[1] if len(sys.argv) > 1 else "sample_data.csv"
+    report = generate_report(input_path)
     export_excel_report(report)
     print("Excel report created: risk_report.xlsx")

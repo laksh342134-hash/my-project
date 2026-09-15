@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 
 from checker import (
     check_duplicates,
@@ -29,5 +30,6 @@ def generate_report(filepath):
     print(f"Total duplicate rows: {duplicates}")
     return report_df
 
-report = generate_report("sample_data.csv")
+input_path = sys.argv[1] if len(sys.argv) > 1 else "sample_data.csv"
+report = generate_report(input_path)
 print(report)
